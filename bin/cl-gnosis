@@ -1,0 +1,25 @@
+#!/usr/local/bin/chez --script
+
+;; ====================================================================
+;; CL-Gnosis: Исполняемый интерфейс ВМ (Точка входа)
+;; ====================================================================
+
+;; На этапе скелета все функции пока живут прямо здесь. 
+;; Когда мы вынесем их в src/, мы заменим этот блок на (import (cl-gnosis engine))
+
+(define (vm-read-code text-stream) (read text-stream))
+(define (vm-compile lisp-expr) (display "[Compiler] Стираем переменные...\n") '(S K I)) 
+(define (vm-allocate-graph comb-term) (display "[Allocator] Выделяем память...\n") "ptr")
+(define (vm-reduce-graph root-ptr) (display "[Engine] Крутим редукцию...\n") "result")
+
+(define (run-cl-gnosis-vm program-text)
+  (display "\n=== ЗАПУСК ВМ CL-GNOSIS ===\n")
+  (let* ([input-port  (open-input-string program-text)]
+         [lisp-code   (vm-read-code input-port)]
+         [comb-term   (vm-compile lisp-code)]
+         [graph-ptr   (vm-allocate-graph comb-term)]
+         [final-state (vm-reduce-graph graph-ptr)])
+    (display "=== ВЫЧИСЛЕНИЕ ЗАВЕРШЕНО ===\n\n")
+    (display "Результат: ") (write final-state) (newline)))
+
+(run-cl-gnosis-vm "(lambda (x) (* x x))")
