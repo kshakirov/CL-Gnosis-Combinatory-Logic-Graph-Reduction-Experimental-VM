@@ -1,9 +1,11 @@
-GCC=gcc
-
-#GCCFLAGS= -std=c23 -Wall -Wextra -Wpedantic -Werror -O2 
-# on purpose duplicated to rewrite and not to forget about the first one
-GCCFLAGS= -std=c23 -Wall  -O2 -lxxhash -DDSS_DEBUG
+CC = gcc
+CFLAGS = -std=c23 -Wall -Wextra -Wpedantic -Werror -O2
+TARGET = experiment
+SOURCES = main.c asm/app.S
 
 all:
-	$(GCC) main.c   -o main $(GCCFLAGS)
+	$(CC) $(CFLAGS) $(SOURCES) -o $(TARGET)
+
+clean:
+	rm -f $(TARGET)
 
