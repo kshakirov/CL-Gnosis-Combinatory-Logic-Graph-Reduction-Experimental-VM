@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>CL-Gnosis Phase 1 POC</title>
+</head>
+<body>
+
+  <!-- Наша атомарная UI-линза -->
+  <button id="btn-42">Загрузка Атома...</button>
+
+  <script>
+    const nodeMap = new Map();
+    const NODE_ATOM = 0;
+    const NODE_COMBINATION = 1;
+
+    async function run() {
+      // 1. Загружаем Wasm-модуль
+      const { instance } = await WebAssembly.instantiateStreaming(
+        fetch('arena.wasm')
+      );
+      const wasm = instance.exports;
+
+      // 2. Инициализируем Си-Арену
+      wasm.init_arena();
+
+      // 3. Привязываем Атом #42 к кнопке за O(1)
+      const btn = document.getElementById('btn-42');
+      nodeMap.set(42, btn);
+
+      // Прямой точечный патч DOM
+      function render() {
+        const count = wasm.get_dirty_count();
+        const ptr = wasm.get_dirty_nodes_ptr();
+        const dirty = new Uint32Array(wasm.memory.buffer, ptr, count);
+
+        for (let i = 0; i < count; i++) {
+          const id = dirty[i];
+          const tag = wasm.get_node_tag(id);
+
+          if (tag === NODE_ATOM) {
+            const domNode = nodeMap.get(id);
+            if (domNode) {
+              const val = wasm.get_node_payload(id);
+              domNode.textContent = `[Атом #${id}] Значение: ${val}`;
+            }
+          }
+        }
+      }
+
+      // Стартовый рендер
+      wasm.increment_node_42();
+      render();
+
+      // Клик мутирует Си-память -> Vanilla JS локально обновляет DOM
+      btn.addEventListener('click', () => {
+        wasm.increment_node_42();
+        render();
+      });
+    }
+
+    run();
+  </script>
+</body>
+</html>
