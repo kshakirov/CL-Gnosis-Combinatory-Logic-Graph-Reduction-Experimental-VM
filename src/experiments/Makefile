@@ -13,7 +13,10 @@ WASM_LDFLAGS := \
 	-Wl,--export=get_dirty_count \
 	-Wl,--export=get_dirty_nodes_ptr \
 	-Wl,--export=get_node_tag \
-	-Wl,--export=get_node_payload \
+	-Wl,--export=get_node_payload_number \
+	-Wl,--export=get_node_payload_string_length \
+	-Wl,--export=get_node_payload_string_pool \
+	-Wl,--export=get_memory_base \
 	-Wl,--export-memory
 
 .PHONY: all check serve clean
@@ -24,7 +27,7 @@ $(WASM): $(SOURCE)
 	$(CLANG) $(CFLAGS) $(WASM_LDFLAGS) $< -o $@
 
 check: $(WASM)
-	$(NODE) -e 'const fs = require("fs"); const bytes = fs.readFileSync("$(WASM)"); const module = new WebAssembly.Module(bytes); const { exports: wasm } = new WebAssembly.Instance(module, {}); wasm.init_arena(); if (wasm.get_node_payload(42) !== 100 || wasm.get_dirty_count() !== 0) throw new Error("invalid initial state"); wasm.increment_node_42(); const dirty = new Uint32Array(wasm.memory.buffer, wasm.get_dirty_nodes_ptr(), wasm.get_dirty_count()); if (wasm.get_node_payload(42) !== 101 || dirty.length !== 1 || dirty[0] !== 42) throw new Error("invalid increment state"); console.log("WASM check passed: payload=101, dirty_nodes=[42]");'
+	$(NODE) -e 'const fs = require("fs"); const bytes = fs.readFileSync("$(WASM)"); const module = new WebAssembly.Module(bytes); const { exports: wasm } = new WebAssembly.Instance(module, {}); wasm.init_arena(); if (wasm.get_node_payload_number(42) !== 100 || wasm.get_dirty_count() !== 0) throw new Error("invalid initial state"); wasm.increment_node_42(); const dirty = new Uint32Array(wasm.memory.buffer, wasm.get_dirty_nodes_ptr(), wasm.get_dirty_count()); if (wasm.get_node_payload_number(42) !== 101 || dirty.length !== 2 || dirty[0] !== 42 || dirty[1] !== 1) throw new Error("invalid increment state"); console.log("WASM check passed: payload=101, dirty_nodes=[42,1]");'
 
 serve: $(WASM)
 	$(PYTHON) -m http.server 8000

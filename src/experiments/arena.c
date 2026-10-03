@@ -1,15 +1,19 @@
 #include <stdint.h>
 
+#define ARENA_SIZE 100000
+#define OBJECT_POOL_SIZE 64*1024
+
+
 // Тег типа узла (Атом или Комбинация)
 typedef enum {
     ATOM_NUMBER = 0,       // Листовой узел: значение, число или комбинатор (S, K, I)
     COMBINATION = 1, // Узел аппликации (@): связывает left и right
     ATOM_STRING=2
 } NodeType;
-#define ARENA_SIZE 100000
+
 #define DIRTY_SIZE 1024
-#define OBJECT_POOL_SIZE 64*1024
-#define OBJECT_POOL_TOP 0
+
+
 
 
 typedef uint8_t OBJECT_POOL[OBJECT_POOL_SIZE];
@@ -24,12 +28,20 @@ typedef struct {
 } Node;
 
 // Статическая бинарная память (Zero allocations)
-static Node arena[ARENA_SIZE];
-static OBJECT_POOL object_pool;
+
 static uint32_t dirty_nodes[DIRTY_SIZE];
 static uint32_t dirty_count = 0;
-#define OBJECT_POOL_OFFSET ARENA_SIZE;
+#define OBJECT_POOL_OFFSET ARENA_SIZE * 16
+#define OBJECT_POOL_TOP 0
 
+
+typedef struct {
+  Node arena[ARENA_SIZE];
+  uint8_t object_pool[OBJECT_POOL_SIZE];
+} Memory;
+
+
+Memory memory;
 // Export: указатель на массив измененных узлов
 uint32_t* get_dirty_nodes_ptr(void) {
     return dirty_nodes;
@@ -51,28 +63,28 @@ void init_arena(void) {
     dirty_count = 0;
 
     // Узел #42 — это Атом со стартовым значением 100
-    arena[42].tag = ATOM_NUMBER;
-    arena[42].left = 0;
-    arena[42].right = 0;
-    arena[42].payload = 100;
+    memory.arena[42].tag = ATOM_NUMBER;
+    memory.arena[42].left = 0;
+    memory.arena[42].right = 0;
+    memory.arena[42].payload = 100;
 
     // Узел #100 — это Комбинация (@), объединяющая узел 42 и узел 43
-    arena[100].tag = COMBINATION;
-    arena[100].left = 42;
-    arena[100].right = 43;
+    memory.arena[100].tag = COMBINATION;
+    memory.arena[100].left = 42;
+    memory.arena[100].right = 43;
 
-    arena[1].tag=ATOM_STRING;
-    arena[1].left = 0;
-    arena[1].right=0;
-    arena[1].payload=OBJECT_POOL_TOP;
+    memory.arena[1].tag=ATOM_STRING;
+    memory.arena[1].left = 0;
+    memory.arena[1].right=0;
+    memory.arena[1].payload=0;
 
-    object_pool[OBJECT_POOL_TOP] =2;
-    object_pool[OBJECT_POOL_TOP + 1] ='h';
-    object_pool[OBJECT_POOL_TOP + 2] ='i';
-    object_pool[OBJECT_POOL_TOP + 3] =3;
-    object_pool[OBJECT_POOL_TOP + 4] ='b';
-    object_pool[OBJECT_POOL_TOP + 5] ='y';
-    object_pool[OBJECT_POOL_TOP + 6] ='e';
+    memory.object_pool[0] =2;
+    memory.object_pool[1] ='h';
+    memory.object_pool[2] ='i';
+    memory.object_pool[3] =3;
+    memory.object_pool[4] ='b';
+    memory.object_pool[5] ='y';
+    memory.object_pool[6] ='e';
     
 
     
@@ -83,16 +95,19 @@ void increment_node_42(void) {
     dirty_count = 0;
 
     // Проверяем, что узел 42 действительно Атом
-    if (arena[42].tag == ATOM_NUMBER) {
-        arena[42].payload += 1;
+    if (memory.arena[42].tag == ATOM_NUMBER) {
+        memory.arena[42].payload += 1;
         
         // Арена сама фиксирует изменение Атома #42
         mark_dirty(42);
-    
+
+
     }
 
-    /* if (arena[1].tag == ATOM_STRING) { */
-    /*   arena[1].payload = OBJECT_POOL_TOP; */
+    memory.arena[1].payload = memory.arena[42].payload % 2 == 0 ? 0 : 3 ;
+    mark_dirty(1);
+    /* if (memory.arena[1].tag == ATOM_STRING) { */
+    /*   memory.arena[1].payload = OBJECT_POOL_TOP; */
     /*     mark_dirty(1); */
     
     /* } */
@@ -103,14 +118,31 @@ void increment_node_42(void) {
 
 // Экспорт тега и payload для чтения из JS
 uint8_t get_node_tag(uint32_t node_id) {
-    return arena[node_id].tag;
+    return memory.arena[node_id].tag;
 }
 
-uint32_t get_node_payload(uint32_t node_id) {
-  if(arena[node_id].tag == ATOM_NUMBER){
-    return arena[node_id].payload;
-  }else if (arena[node_id].tag== ATOM_STRING){
-    return  0;
+uint32_t get_node_payload_number(uint32_t node_id) {
+  if(memory.arena[node_id].tag == ATOM_NUMBER){
+    return memory.arena[node_id].payload;
   }
   return -1;
+}
+
+uint32_t get_node_payload_string_length(uint32_t node_id){
+  if(memory.arena[node_id].tag == ATOM_STRING){
+    return memory.object_pool[memory.arena[node_id].payload];
+  }
+    return -1;
+}
+
+
+uint32_t get_node_payload_string_pool(uint32_t node_id){
+  if(memory.arena[node_id].tag == ATOM_STRING){
+      return  memory.arena[node_id].payload + 1 ;
+  }
+    return -1;
+}
+
+uint32_t get_memory_base(void) {
+    return (uint32_t)(uintptr_t)&memory;
 }
