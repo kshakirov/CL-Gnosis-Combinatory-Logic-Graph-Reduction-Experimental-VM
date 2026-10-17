@@ -50,7 +50,12 @@ uint32_t get_active_page_root(void) {
     return active_page_root;
 }
 
-
+void  change_root_page(void){
+  if(active_page_root== PAGE_A_ROOT)
+    active_page_root=  PAGE_B_ROOT;
+  else
+    active_page_root = PAGE_A_ROOT;
+}
 void init_arena(void) {
 
   arena[0].payload = PAGE_A;

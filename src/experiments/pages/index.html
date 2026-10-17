@@ -8,13 +8,13 @@
     <main id="app"></main>
     <template id="page-a">
       <div data-role="info"></div>
-      <button data-role="show">Показать A</button>
-      <button data-role="navigate">Страница B</button>
+      <button onClick="navigatePage()" data-role="show">Показать A</button>
+      <button  data-role="navigate">Страница B</button>
     </template>
     <template id="page-b">
       <div data-role="info"></div>
-      <button data-role="show">Показать B</button>
-      <button data-role="navigate">Страница A</button>
+      <button onClick="navigatePage()" data-role="show">Показать B</button>
+      <button  data-role="navigate">Страница A</button>
     </template>
     <script type="module" src="./app.js"></script>
   </body>

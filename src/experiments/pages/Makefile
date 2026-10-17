@@ -10,6 +10,7 @@ WASM_LDFLAGS := \
 	-Wl,--no-entry \
 	-Wl,--export=init_arena \
 	-Wl,--export=get_active_page_root \
+	-Wl,--export=change_root_page \
 	-Wl,--export=get_node_tag \
 	-Wl,--export=get_node_left \
 	-Wl,--export=get_node_right \
