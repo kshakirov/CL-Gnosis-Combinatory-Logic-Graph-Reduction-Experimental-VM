@@ -18,7 +18,14 @@ async function run() {
 	let atoms = collectAtoms(wasm, pageRoot);
 	renderTemplate(root, atoms);
 
-    }
+    };
+
+    window.testDirtyNodes = function(){
+	console.log("Dirty nodes testing ");
+	const infoElement = document.querySelector('[data-role="info"]');
+	infoElement.textContent = "Help me";
+
+    };
 
 
     const pageRoot = wasm.get_active_page_root();
@@ -61,7 +68,6 @@ async function run() {
 	const infoElement = clone.querySelector('[data-role="info"]');
 	const showButton = clone.querySelector('[data-role="show"]');
 	const navigateButton = clone.querySelector('[data-role="navigate"]');
-
 	nodeMap.set(atoms[1], infoElement);
 	nodeMap.set(atoms[2], showButton);
 	nodeMap.set(atoms[3], navigateButton);

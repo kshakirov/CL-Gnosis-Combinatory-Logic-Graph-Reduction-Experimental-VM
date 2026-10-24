@@ -7,14 +7,18 @@
   <body>
     <main id="app"></main>
     <template id="page-a">
-      <div data-role="info"></div>
+      <div data-role="info">Page a before </div>
       <button onClick="navigatePage()" data-role="show">Показать A</button>
       <button  data-role="navigate">Страница B</button>
+      <br/>
+      <button onClick="testDirtyNodes()" data-role="show">Test Dirty nodes on A</button>
     </template>
     <template id="page-b">
-      <div data-role="info"></div>
+      <div data-role="info">Page b before</div>
       <button onClick="navigatePage()" data-role="show">Показать B</button>
       <button  data-role="navigate">Страница A</button>
+      <br/>
+      <button onClick="testDirtyNodes()" data-role="show">Test Dirty nodes on B</button>
     </template>
     <script type="module" src="./app.js"></script>
   </body>
