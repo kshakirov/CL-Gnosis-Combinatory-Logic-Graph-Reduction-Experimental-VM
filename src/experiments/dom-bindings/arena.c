@@ -13,7 +13,7 @@ typedef enum {
 
 
 typedef struct {
-    uint8_t  tag;        // NODE_ATOM (0) или NODE_COMBINATION (1)
+    uint32_t  tag;        // NODE_ATOM (0) или NODE_COMBINATION (1)
     uint32_t left;       // Индекс левого ребенка (если NODE_COMBINATION)
     uint32_t right;      // Индекс правого ребенка (если NODE_COMBINATION)
     uint32_t payload;    // Значение (если NODE_ATOM)
@@ -54,7 +54,7 @@ void init_arena(void) {
   arena[1].tag = ATOM_STRING;
   arena[1].left = 0;
   arena[1].right = 0;
-  arena[1].payload = 0;
+  arena[1].payload = 100;
 
   arena[2].tag = ATOM_NUMBER;
   arena[2].left = 0;
