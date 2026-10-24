@@ -54,12 +54,12 @@ void init_arena(void) {
   arena[1].tag = ATOM_STRING;
   arena[1].left = 0;
   arena[1].right = 0;
-  arena[1].payload = 100;
+  arena[1].payload = 0;
 
   arena[2].tag = ATOM_NUMBER;
   arena[2].left = 0;
   arena[2].right = 0;
-  arena[2].payload = 2;
+  arena[2].payload = 33;
 
   object_pool[0] =2;
   object_pool[1] ='h';

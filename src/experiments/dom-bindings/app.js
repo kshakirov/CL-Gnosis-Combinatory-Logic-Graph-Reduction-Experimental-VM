@@ -15,15 +15,27 @@ async function run() {
     const root = document.getElementById("app");
     nodeToDomMap[1] = root.querySelector(`[data-node-id="1"]`);
     nodeToDomMap[2] = root.querySelector(`[data-node-id="2"]`);
-    const initital_button_label = view_arena_node(wasm.memory.buffer, arena_base + 16,  16);
-    nodeToDomMap[1].textContent= "Hello, bro " + initital_button_label + " times" ;
+    
+    
+    const initial_h1_value = view_string(wasm.memory.buffer, object_pool_ptr);
+    nodeToDomMap[1].textContent= "bro " + initial_h1_value  ;
+    const initital_button_label = view_arena_node(wasm.memory.buffer, arena_base + 32,  16);
+    nodeToDomMap[2].textContent= "Clicked:  " + initital_button_label + " times"  ;
 }
 
 run().catch(console.error);
 
 
-function view_arena_node(buffer, arena_base, nodeLength){
-    const dv = new DataView(buffer, arena_base, nodeLength);
+function view_arena_node(buffer, arena_base, byteLength){
+    const dv = new DataView(buffer, arena_base, byteLength);
     return dv.getUint32(12, true);   // payload
 
+}
+
+function view_string(buffer, object_pool_ptr){
+    const length = new Uint8Array(buffer,object_pool_ptr,1)
+    const payload = new Uint8Array(buffer,object_pool_ptr + 1,length[0]);
+    const decoder = new TextDecoder();
+    return decoder.decode(payload);
+    
 }

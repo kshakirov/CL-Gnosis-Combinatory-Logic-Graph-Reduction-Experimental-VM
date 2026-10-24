@@ -66,7 +66,7 @@ void init_arena(void) {
     memory.arena[42].tag = ATOM_NUMBER;
     memory.arena[42].left = 0;
     memory.arena[42].right = 0;
-    memory.arena[42].payload = 100;
+    memory.arena[42].payload = 0;
 
     // Узел #100 — это Комбинация (@), объединяющая узел 42 и узел 43
     memory.arena[100].tag = COMBINATION;
