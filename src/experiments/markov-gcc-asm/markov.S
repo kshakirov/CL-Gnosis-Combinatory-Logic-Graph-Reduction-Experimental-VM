@@ -27,22 +27,25 @@ simd_match16:
 .global markovNAM
 .type markovNAM, @function
 
-# int markovNAM(position, pattern, mask)
-# %rdi = адрес текущей позиции в рабочем буфере
-# %rsi = адрес 16-байтового образца
-# %edx = маска значимых байтов образца
+# int markovNAM(buffer,position)
+# %rdi = лента буфер
+# %rsi = длина ленты
+# %rdx = будущие правила 
 # %eax = 1 при совпадении, иначе 0
 markovNAM:
 position_loop:
-
-	movq $8, %rax
+	
+	#movq %rsi, %rax
+	movq $0, %r10
 loop:
-	cmp $0, %rax
-	je exit
-	sub $1, %rax
+	cmp %rsi, %r10
+	jae exit
+	add $1, %r10
 	jmp loop
+
 exit:
-    ret
+    movq %r10,%rax		
+    ret	
 	
 	
 
