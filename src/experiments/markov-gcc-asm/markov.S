@@ -30,18 +30,30 @@ simd_match16:
 # int markovNAM(buffer,position)
 # %rdi = лента буфер
 # %rsi = длина ленты
-# %rdx = будущие правила 
-# %eax = 1 при совпадении, иначе 0
+# %rdx = будущие правила
+# %rcx = количество правил 	
+# %r11 = индекс текущего правила 
+	
 markovNAM:
 position_loop:
 	
 	#movq %rsi, %rax
 	movq $0, %r10
-loop:
-	cmp %rsi, %r10
+external_loop:
+	movq $0,%r11 # index of first rule		
+inner_loop:
+
+	# here run the rule macro or simd_match16
+	# here check if 1 loop back from the 0th rule if not go with anoter rule
+	cmp %rcx, %r11
+	jae next_position	
+	add $1, %r11
+	jmp inner_loop
+next_position:
+	cmp %rsi, %r10		
 	jae exit
 	add $1, %r10
-	jmp loop
+	jmp external_loop
 
 exit:
     movq %r10,%rax		
