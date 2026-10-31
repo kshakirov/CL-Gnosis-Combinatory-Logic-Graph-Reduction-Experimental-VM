@@ -22,6 +22,19 @@ simd_match16:
 
 .section .note.GNU-stack,"",@progbits
 
+.macro TRY_RULE position, rule
+    movdqu  (%rdi), %xmm0
+    movdqu  (%rsi), %xmm1
+    pcmpeqb %xmm1, %xmm0
+    pmovmskb %xmm0, %eax
+    andl    %edx, %eax
+    cmpl    %edx, %eax
+    sete    %al
+    movzbl  %al, %eax
+.endm
+
+
+
 
 .section .text
 .global markovNAM
