@@ -25,7 +25,9 @@ async function run() {
     objectPoolBase = wasm.get_object_pool_ptr();
     dirtyNodesBase = wasm.get_dirty_nodes_ptr();
     console.log(arenaBase);
-    renderTemplate();
+    const atoms = createTopologiesList(0,3)
+    console.log(atoms);
+    renderTemplate(atoms);
     
     //bindNodes(root);
 
@@ -33,16 +35,25 @@ async function run() {
     //     renderNode(nodeId);
     // }
 }
+function createTopologiesList(start, end){
+    let atoms = [];
+    for (let i = start;i < end; i++){
+	atoms.push(readNode(i));
+    }
+    return atoms;
+}
 
- function renderTemplate(){
+ function renderTemplate(atoms){
 
      const tpl = document.getElementById("topologies-page");
      let clone = tpl.content.cloneNode(true);
      const ul = clone.querySelector('[data-role="ul-1"]');
      console.log(ul);
      for (let i = 0;i < 3; i++){
+	 const content = readString(atoms[i].payload);
+	 
 	 const li = document.createElement('li');
-	 li.textContent = 'new ' + i;
+	 li.textContent = content;
 	 ul.append(li);
      }
 
