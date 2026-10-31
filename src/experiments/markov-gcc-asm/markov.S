@@ -40,9 +40,10 @@ position_loop:
 	#movq %rsi, %rax
 	movq $0, %r10
 external_loop:
+	cmp %rsi, %r10		
+	jae exit
 	movq $0,%r11 # index of first rule		
 inner_loop:
-
 	# here run the rule macro or simd_match16
 	# here check if 1 loop back from the 0th rule if not go with anoter rule
 	cmp %rcx, %r11
@@ -50,8 +51,7 @@ inner_loop:
 	add $1, %r11
 	jmp inner_loop
 next_position:
-	cmp %rsi, %r10		
-	jae exit
+
 	add $1, %r10
 	jmp external_loop
 
