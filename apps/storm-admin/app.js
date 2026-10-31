@@ -6,7 +6,6 @@ const ATOM_NUMBER = 1;
 const ATOM_STRING = 2;
 
 const nodeToDomMap = new Map();
-
 let wasm;
 let root;
 let arenaBase;
@@ -25,13 +24,33 @@ async function run() {
     arenaBase = wasm.get_arena_base();
     objectPoolBase = wasm.get_object_pool_ptr();
     dirtyNodesBase = wasm.get_dirty_nodes_ptr();
+    console.log(arenaBase);
+    renderTemplate();
+    
+    //bindNodes(root);
 
-    bindNodes(root);
-
-    for (const nodeId of nodeToDomMap.keys()) {
-        renderNode(nodeId);
-    }
+    // for (const nodeId of nodeToDomMap.keys()) {
+    //     renderNode(nodeId);
+    // }
 }
+
+ function renderTemplate(){
+
+     const tpl = document.getElementById("topologies-page");
+     let clone = tpl.content.cloneNode(true);
+     const ul = clone.querySelector('[data-role="ul-1"]');
+     console.log(ul);
+     for (let i = 0;i < 3; i++){
+	 const li = document.createElement('li');
+	 li.textContent = 'new ' + i;
+	 ul.append(li);
+     }
+
+     const parent = document.getElementById("workspace");
+     parent.replaceChildren(clone);
+
+ }
+
 
 function bindNodes(scope) {
     nodeToDomMap.clear();
