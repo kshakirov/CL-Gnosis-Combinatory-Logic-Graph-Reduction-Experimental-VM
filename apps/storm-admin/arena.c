@@ -22,6 +22,13 @@ static uint8_t object_pool[OBJECT_POOL_SIZE];
 static uint32_t dirty_nodes[DIRTY_SIZE];
 static uint32_t dirty_count;
 
+typedef enum {
+  MAIN_PAGE= 100,
+  PAGE_TOPOLOGY = 111
+  } CURRENT_PAGE;
+
+
+
 
 void aux_create_arena_node(int idx, uint32_t tag, uint32_t left, uint32_t right, uint32_t payload ){
   arena[idx].tag = tag;
@@ -31,6 +38,12 @@ void aux_create_arena_node(int idx, uint32_t tag, uint32_t left, uint32_t right,
   
 }
 
+void aux_create_combiantion(int idx, int l, int r){
+  arena[idx].left = l;
+  arena[idx].right = r;
+  arena[idx].tag = COMBINATION;
+  
+}
 
 
 void aux_add_string_to_obj_pool(const char* string, const int length, const uint32_t offset ){
@@ -68,5 +81,27 @@ void init_arena(void) {
   aux_create_arena_node(1, ATOM_STRING, 0, 0, 7);
   aux_add_string_to_obj_pool(topologies[2], 6, 14);
   aux_create_arena_node(2, ATOM_STRING, 0, 0, 14);
+
+  aux_create_arena_node(3, ATOM_NUMBER, 0, 0, MAIN_PAGE);
+  aux_create_arena_node(4, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY);
+  aux_create_arena_node(5, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY);
+  aux_create_arena_node(6, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY);
+
+  //main page subgraph
+  aux_create_combiantion(7, 3, 0);
+  aux_create_combiantion(8, 7, 1);
+  aux_create_combiantion(9, 8, 2);
+  
+
+  //top  page 1 subgraph
+  aux_create_combiantion(10, 4, 0);
+
+  //top  page 2 subgraph
+  aux_create_combiantion(11, 5, 1);
+
+  //top  page 2 subgraph
+  aux_create_combiantion(12, 6, 2);
+  
+  
   dirty_count = 0;
 }
