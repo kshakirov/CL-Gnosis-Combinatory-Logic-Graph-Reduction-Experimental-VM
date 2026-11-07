@@ -73,6 +73,18 @@ void clear_dirty_nodes(void) {
     dirty_count = 0;
 }
 
+
+static uint32_t active_page_root = 9;
+
+uint32_t get_active_page_root(void) {
+    return active_page_root;
+}
+
+void  change_root_page(int topology_id){
+  // here will be switch
+  //active page will be dirty
+}
+
 char* topologies[] ={"Core M","Test a","Test b"} ;
 void init_arena(void) {
   aux_add_string_to_obj_pool(topologies[0], 6, 0);
@@ -84,8 +96,7 @@ void init_arena(void) {
 
   aux_create_arena_node(3, ATOM_NUMBER, 0, 0, MAIN_PAGE);
   aux_create_arena_node(4, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY);
-  aux_create_arena_node(5, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY);
-  aux_create_arena_node(6, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY);
+
 
   //main page subgraph
   aux_create_combiantion(7, 3, 0);
@@ -97,10 +108,10 @@ void init_arena(void) {
   aux_create_combiantion(10, 4, 0);
 
   //top  page 2 subgraph
-  aux_create_combiantion(11, 5, 1);
+  aux_create_combiantion(11, 4, 1);
 
   //top  page 2 subgraph
-  aux_create_combiantion(12, 6, 2);
+  aux_create_combiantion(12, 4, 2);
   
   
   dirty_count = 0;
