@@ -53,7 +53,15 @@ function createTopologiesList(start, end){
 	 const content = readString(atoms[i].payload);
 	 
 	 const li = document.createElement('li');
-	 li.textContent = content;
+	 const a = document.createElement('a');
+	 a.setAttribute('href',"http://localhost:9090/");
+	 a.setAttribute('data-topology-id',`${i}`);
+	 a.textContent = content;
+	 a.addEventListener('click', (e) =>{
+	     e.preventDefault();
+	     console.log("id is " + e.currentTarget.dataset.topologyId);
+	 })
+	 li.append(a);
 	 ul.append(li);
      }
 
