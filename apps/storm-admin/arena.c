@@ -81,6 +81,7 @@ uint32_t get_active_page_root(void) {
 }
 
 void  change_root_page(int topology_id){
+  (void)topology_id;
   // here will be switch
   //active page will be dirty
 }
