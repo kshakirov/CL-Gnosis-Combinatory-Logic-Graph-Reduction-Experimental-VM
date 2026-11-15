@@ -13,6 +13,8 @@ WASM_LDFLAGS := \
 	-Wl,--export=get_object_pool_ptr \
 	-Wl,--export=get_dirty_nodes_ptr \
 	-Wl,--export=get_dirty_count \
+	-Wl,--export=get_active_page_root \
+	-Wl,--export=change_root_page \
 	-Wl,--export=clear_dirty_nodes \
 	-Wl,--export-memory
 

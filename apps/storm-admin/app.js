@@ -1,6 +1,8 @@
 const NODE_SIZE = 16;
 const TAG_OFFSET = 0;
 const PAYLOAD_OFFSET = 12;
+const LEFT_OFFSET = 4;
+const RIGHT_OFFSET = 8;
 
 const ATOM_NUMBER = 1;
 const ATOM_STRING = 2;
@@ -11,6 +13,7 @@ let root;
 let arenaBase;
 let objectPoolBase;
 let dirtyNodesBase;
+let page_root;
 
 async function run() {
     const { instance } = await WebAssembly.instantiateStreaming(
@@ -22,6 +25,8 @@ async function run() {
 
     root = document.getElementById('app');
     arenaBase = wasm.get_arena_base();
+    page_root = wasm.get_active_page_root();
+    console.log(page_root);
     objectPoolBase = wasm.get_object_pool_ptr();
     dirtyNodesBase = wasm.get_dirty_nodes_ptr();
     console.log(arenaBase);
@@ -60,6 +65,12 @@ function createTopologiesList(start, end){
 	 a.addEventListener('click', (e) =>{
 	     e.preventDefault();
 	     console.log("id is " + e.currentTarget.dataset.topologyId);
+	     wasm.change_root_page(parseInt(e.currentTarget.dataset.topologyId));
+	     let apr = wasm.get_active_page_root();
+	     console.log(apr);
+	     console.log(readNode(apr));
+	     routeToPage(apr);
+	     
 	 })
 	 li.append(a);
 	 ul.append(li);
@@ -69,6 +80,48 @@ function createTopologiesList(start, end){
      parent.replaceChildren(clone);
 
  }
+
+//simplified
+function routeToPage(root){
+    let r_node= readNode(root);
+    let template_atom = readNode(r_node.left);
+    switch(template_atom.payload){
+    case 100:{
+	console.log("main page")
+
+	break;
+    }
+    case 111:{
+	console.log("topology page");
+	let atom = readNode(r_node.right);
+	renderTopologyTemplate(atom);
+	break
+    }
+    default: {
+	console.log("can't make out the templatte");
+    }
+    }
+    
+    
+}
+
+
+ function renderTopologyTemplate(atom){
+
+     const tpl = document.getElementById("topology-page");
+     let clone = tpl.content.cloneNode(true);
+     const h2 = clone.querySelector('[data-role="h2-topology-name"]');
+     const h3 = clone.querySelector('[data-role="h3-topology-id"]');
+     h2.textContent = "Topology Name: const test"
+     h3.textContent = "Topology Id: const 1"
+     
+     console.log(h2);
+
+     const parent = document.getElementById("workspace");
+     parent.replaceChildren(clone);
+
+ }
+
 
 
 function bindNodes(scope) {
@@ -91,7 +144,9 @@ function readNode(nodeId) {
 
     return {
         tag: view.getUint32(TAG_OFFSET, true),
-        payload: view.getUint32(PAYLOAD_OFFSET, true)
+        payload: view.getUint32(PAYLOAD_OFFSET, true),
+	left: view.getUint32(LEFT_OFFSET, true),
+	right: view.getUint32(RIGHT_OFFSET, true)
     };
 }
 

@@ -5,16 +5,16 @@
 #define DIRTY_SIZE 1024
 
 typedef enum {
-    ATOM_NUMBER = 1,
-    ATOM_STRING = 2,
-    COMBINATION = 3
+  ATOM_NUMBER = 1,
+  ATOM_STRING = 2,
+  COMBINATION = 3
 } NodeType;
 
 typedef struct {
-    uint32_t tag;
-    uint32_t left;
-    uint32_t right;
-    uint32_t payload;
+  uint32_t tag;
+  uint32_t left;
+  uint32_t right;
+  uint32_t payload;
 } Node;
 
 static Node arena[ARENA_SIZE];
@@ -25,7 +25,7 @@ static uint32_t dirty_count;
 typedef enum {
   MAIN_PAGE= 100,
   PAGE_TOPOLOGY = 111
-  } CURRENT_PAGE;
+} CURRENT_PAGE;
 
 
 
@@ -54,34 +54,49 @@ void aux_add_string_to_obj_pool(const char* string, const int length, const uint
 }
 
 uint32_t get_arena_base(void) {
-    return (uint32_t)(uintptr_t)arena;
+  return (uint32_t)(uintptr_t)arena;
 }
 
 uint32_t get_object_pool_ptr(void) {
-    return (uint32_t)(uintptr_t)object_pool;
+  return (uint32_t)(uintptr_t)object_pool;
 }
 
 uint32_t get_dirty_nodes_ptr(void) {
-    return (uint32_t)(uintptr_t)dirty_nodes;
+  return (uint32_t)(uintptr_t)dirty_nodes;
 }
 
 uint32_t get_dirty_count(void) {
-    return dirty_count;
+  return dirty_count;
 }
 
 void clear_dirty_nodes(void) {
-    dirty_count = 0;
+  dirty_count = 0;
 }
 
 
 static uint32_t active_page_root = 9;
 
 uint32_t get_active_page_root(void) {
-    return active_page_root;
+  return active_page_root;
 }
 
 void  change_root_page(int topology_id){
   (void)topology_id;
+  switch(topology_id){
+  case 0: {
+    active_page_root = 10;
+    break;
+  }
+  case 1:{
+    active_page_root = 11;
+    break;
+  }
+  case 2:{
+    active_page_root = 12;
+    break;
+  }
+  default: active_page_root= 9;
+  }
   // here will be switch
   //active page will be dirty
 }
@@ -96,7 +111,7 @@ void init_arena(void) {
   aux_create_arena_node(2, ATOM_STRING, 0, 0, 14);
 
   aux_create_arena_node(3, ATOM_NUMBER, 0, 0, MAIN_PAGE);
-  aux_create_arena_node(4, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY);
+  aux_create_arena_node(4, ATOM_NUMBER, 0, 0, PAGE_TOPOLOGY); //atom points to template
 
 
   //main page subgraph
