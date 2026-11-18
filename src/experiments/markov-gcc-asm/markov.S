@@ -71,14 +71,18 @@ inner_loop:
 	# here check if 1 loop back from the 0th rule if not go with anoter rule
 	cmp %rcx, %r11
 	jae next_position
-	TRY_RULE %rdi, %r10, %rdx, %r11		
+	TRY_RULE %rdi, %r10, %rdx, %r11
+	cmp $0, %eax
+	jnz same_position
 	add $1, %r11
 	jmp inner_loop
 next_position:
 
 	add $1, %r10
 	jmp external_loop
-
+same_position:
+	jmp external_loop
+	
 exit:
     movq %r10,%rax		
     ret	
