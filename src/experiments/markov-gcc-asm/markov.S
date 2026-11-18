@@ -22,20 +22,25 @@ simd_match16:
 
 .section .note.GNU-stack,"",@progbits
 
+#r9 + 0  → образец
+#r9 + 16 → замена
+#r9 + 32 → готовая маска длины
+
+	
 .macro TRY_RULE tape, tape_position, rules, rule_idx
     movq    \tape, %r8
     add \tape_position, %r8
     movq \rule_idx, %r9
-    shl $6, %r9
-    add \rules, %r9	
-    movdqu  (%r8), %xmm0
-    movdqu  (%r9), %xmm1
-    pcmpeqb %xmm1, %xmm0
-    pmovmskb %xmm0, %eax
-    andl    %edx, %eax
-    cmpl    %edx, %eax
-    sete    %al
-    movzbl  %al, %eax
+    shl $6, %r9  #here we have rule index which we multiply by 64 it is a rule fixed size
+    add \rules, %r9	 # here we add rules offset 
+    movdqu  (%r8), %xmm0  # here you have the to search where
+    movdqu  (%r9), %xmm1  #here you can see
+    pcmpeqb %xmm1, %xmm0  # here the parallel cmp by byte 
+    pmovmskb %xmm0, %eax  #here we move mask to eax 
+    andl    32(%r9), %eax   # here we do AND with rules and masks to see the real length of cmp
+    cmpl    32(%r9), %eax # compare long - l, means with sign 
+    sete    %al    # set flag 1 or 0 if the previous comparison is 
+    movzbl  %al, %eax # move byte and expand it with zeros
 .endm
 
 
