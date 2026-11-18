@@ -43,6 +43,18 @@ simd_match16:
     movzbl  %al, %eax # move byte and expand it with zeros
 .endm
 
+.macro REPLACE_RULE
+	movq $0, %r11
+copy_loop\@:
+	cmp 40(%r9), %r11d
+	jz exit\@
+	movb 16(%r9,%r11,1), %al
+	movb %al, (%r8,%r11,1)	
+	add $1, %r11
+	jmp copy_loop\@
+exit\@:	
+.endm
+
 
 
 
@@ -81,6 +93,7 @@ next_position:
 	add $1, %r10
 	jmp external_loop
 same_position:
+	REPLACE_RULE
 	jmp external_loop
 	
 exit:

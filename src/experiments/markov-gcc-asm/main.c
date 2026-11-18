@@ -49,7 +49,8 @@ int create_rules(unsigned char *rule_tape,
 }
 
 int main(void) {
-    const unsigned char buffer[32] = "abc xyz";
+    /* markovNAM rewrites the working tape in place. */
+    unsigned char buffer[32] = "abc xyz";
     const unsigned long position = 7;
     const unsigned char patterns[] = {'a', 'b', 'x', 'y'};
     const unsigned char replacements[] = {'x', 'y', 'z', 'z'};
@@ -60,8 +61,10 @@ int main(void) {
         return 1;
     }
 
+    printf("tape before is %s\n", buffer);
     const int counter = markovNAM(buffer, position, rules, rules_length);
     printf("counter is %d\n", counter);
+    printf("tape is %s\n", buffer);
 
     return 0;
 }
