@@ -26,14 +26,14 @@ async function run() {
     root = document.getElementById('app');
     arenaBase = wasm.get_arena_base();
     page_root = wasm.get_active_page_root();
-    console.log(page_root);
+    //console.log(page_root);
     objectPoolBase = wasm.get_object_pool_ptr();
     dirtyNodesBase = wasm.get_dirty_nodes_ptr();
-    console.log(arenaBase);
-    const atoms = createTopologiesList(0,3)
-    console.log(atoms);
-    renderTemplate(atoms);
-    
+    //console.log(arenaBase);
+    //const atoms = createTopologiesList(0,3)
+    //console.log(atoms);
+    //renderTemplate(atoms);
+    routeToPage(page_root);
     //bindNodes(root);
 
     // for (const nodeId of nodeToDomMap.keys()) {
@@ -98,7 +98,9 @@ function routeToPage(root){
 	break
     }
     default: {
-	console.log("can't make out the templatte");
+	console.log("main page no root id");
+	const atoms = createTopologiesList(0,3);
+	renderTemplate(atoms);
     }
     }
     
@@ -114,8 +116,13 @@ function routeToPage(root){
      const h3 = clone.querySelector('[data-role="h3-topology-id"]');
      h2.textContent = "Topology Name: const test"
      h3.textContent = "Topology Id: const 1"
-     
-     console.log(h2);
+     const btn1 = clone.querySelector('[data-role="btn-1-main-topology"]');
+     btn1.addEventListener('click', ()=> {
+	 wasm.change_root_page(-1);
+	 let apr = wasm.get_active_page_root();
+	 console.log(`now active page is ${apr}`);
+	 routeToPage(apr);
+     });
 
      const parent = document.getElementById("workspace");
      parent.replaceChildren(clone);
